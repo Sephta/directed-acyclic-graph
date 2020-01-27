@@ -11,13 +11,13 @@ Assignment02 ~ Find longest path in Directed Acyclic Graph and number of longest
 
 #define MAX_FILENAME_LEN 14
 
-
-void usage(int argc, char** argv) {
-    if (argc < 3 || argc > 3) {
-        fprintf(stderr, "usage: %s <input> <output>\n", argv[0]);
-        exit(EXIT_FAILURE);
-    }
-}
+// ! To be Removed: usage(int, char**)
+// void usage(int argc, char** argv) {
+//     if (argc < 3 || argc > 3) {
+//         fprintf(stderr, "usage: %s <input> <output>\n", argv[0]);
+//         exit(EXIT_FAILURE);
+//     }
+// }
 
 /* Node Struct
  * A Node contains a value and a list of its neighbors
@@ -40,12 +40,12 @@ typedef struct Edge {
 void Malloc_Graph();
 
 // Todo: Read in data from input file ...
-void Read_Matrix_Data(int *n, int *m, int** start, int** end, int** weight, FILE** input) {
+void Read_Matrix_Data(int *n, int *m, int** start, int** end, int** weight) {
     /* First line of the file contains two numbers N, and M
        * N : number of nodes
        * M : number of edges
     */
-    fscanf(*input, "%d %d", n, m);
+    fscanf(stdin, "%d %d", n, m);
 
     /* Now I malloc the arrays passed into Read_Matrix_Data
        * start : a list of the starting nodes for a given edge
@@ -58,38 +58,40 @@ void Read_Matrix_Data(int *n, int *m, int** start, int** end, int** weight, FILE
 
     // Assign values
     for (int i = 0; i < *m; i++) {
-        fscanf(*input, "%d %d %d", &(*start)[i], &(*end)[i], &(*weight)[i]);
+        fscanf(stdin, "%d %d %d", &(*start)[i], &(*end)[i], &(*weight)[i]);
     }
 
     // ! TO BE REMOVED LATER:
-    // printf("Grabbing graph data from stdin...\n");
-    // printf(".\n");
-    // printf(". N : %d\n. M : %d\n", *n, *m);
-    // printf(".\n");
-    // for (int j = 0; j < *m; j++)
-    //     printf(". . %d -> %d . W : %d\n", (*start)[j], (*end)[j], (*weight)[j]);
-    // printf(".\n");
-    // printf(". Done\n");
-    // printf("\n");
+    printf("Grabbing graph data from stdin...\n");
+    printf(".\n");
+    printf(". N : %d\n. M : %d\n", *n, *m);
+    printf(".\n");
+    for (int j = 0; j < *m; j++)
+        printf(". . %d -> %d . W : %d\n", (*start)[j], (*end)[j], (*weight)[j]);
+    printf(".\n");
+    printf(". Done\n");
+    printf("\n");
 }
 
 // Todo: T-Sort
 void TopologicalSort();
 
 // main is where the whole program executes
-int main(int argc, char** argv) {    
+int main() {    
     // function used to define usage of program
-    usage(argc, argv); 
+    // ! usage(argc, argv); 
 
-    int name_len = strlen(argv[1]);  // gets length of input file 1
+    // ! int name_len = strlen(argv[1]);  // gets length of input file 1
 
-    if (name_len > MAX_FILENAME_LEN) {
-        fprintf(stderr, "Input file <%s> contains too many characters. Max length allowed is : %d\n", argv[1], MAX_FILENAME_LEN);
-        exit(EXIT_FAILURE);
-    }
+    /*
+    ! // if (name_len > MAX_FILENAME_LEN) {
+    ! //     fprintf(stderr, "Input file <%s> contains too many characters. Max length allowed is : %d\n", argv[1], MAX_FILENAME_LEN);
+    ! //     exit(EXIT_FAILURE);
+    ! // }
+    */
 
-    char matrix_name[MAX_FILENAME_LEN];  // init char *
-    strcpy(matrix_name, argv[1]);        // copies over file_name to a char*
+    // ! char matrix_name[MAX_FILENAME_LEN];  // init char *
+    // ! strcpy(matrix_name, argv[1]);        // copies over file_name to a char*
 
     int n;  // Number of Nodes
     int m;  // Number of Edges
@@ -100,7 +102,7 @@ int main(int argc, char** argv) {
     /* ----------------------------------------------------------------------------------------- */
     // Beginning stdout stream ... 
     printf("\n");
-    fprintf(stdout, "Beginning read of Matrix : <%s> ... \n", matrix_name);
+    // ! fprintf(stdout, "Beginning read of Matrix : <%s> ... \n", matrix_name);
 
     // Todo: using file/io read in data from input file and store in some arr
 
@@ -108,24 +110,27 @@ int main(int argc, char** argv) {
     // ! end_nodes = malloc(sizeof(int) * m);
     // ! weight = malloc(sizeof(int) * m);
 
-    FILE* input = fopen(argv[1], "r");  // Opens input file for read only
+    // !FILE* input = fopen(argv[1], "r");  // Opens input file for read only
 
-    if (input == NULL) {
-        fprintf(stderr, "ERR: could not open file <%s>\n", matrix_name);
-        exit(EXIT_FAILURE);
-    }
+    /*
+    ! // if (input == NULL) {
+    ! //     fprintf(stderr, "ERR: could not open file <%s>\n", matrix_name);
+    ! //     exit(EXIT_FAILURE);
+    ! // }
+    */
 
-    Read_Matrix_Data(&n, &m, &start_nodes, &end_nodes, &weight, &input);
+    // ! Read_Matrix_Data(&n, &m, &start_nodes, &end_nodes, &weight, &input);
+    Read_Matrix_Data(&n, &m, &start_nodes, &end_nodes, &weight);
 
     assert(start_nodes);
     assert(end_nodes);
     assert(weight);
 
-    fclose(input);
+    // ! fclose(input);
 
     // Todo: malloc necessary items from the arr to the 'graph'
 
-    Malloc_Graph();
+    // Malloc_Graph();
 
     //Todo: stuff ...
 

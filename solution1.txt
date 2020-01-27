@@ -1,0 +1,2 @@
+longest path: 20
+number of longest paths: 3
