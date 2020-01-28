@@ -107,21 +107,26 @@ void Build_P_Tree(int n, int m, int* start, int* end, int* weight, Node** p) {
 
 // Todo: add comments
 void Process_P_Tree(int n, int m, int* lp, int* nlp, Node** p) {
-    
+    int nlp_count = 0;
     for (int i = 0; i < n; i++) {
         // printf("Node(%d) ~ ", i + 1);
         for (int j = 1; j < n; j++) {
             if (p[i][j].val == -1)
                 break;
             else {
-
                 if (p[i][j].w + lp[p[i][j].val - 1] > lp[i]) {
                     lp[i] = p[i][j].w + lp[p[i][j].val - 1];
+                    nlp_count += 1;
+                    // if (nlp[i] == nlp[i - 1])
+                    //     nlp[i] = nlp[i - 1];
+                    // else if (nlp[i - 1] < nlp[i])
+                    //     nlp[i] += nlp[i - 1];
                 } else if (p[i][j].w + lp[p[i][j].val - 1] == lp[i])
-                    nlp[i] += nlp[i-1];
-                // printf("lp : %d\n", lp[i]);
+                    // nlp[i] += nlp[i-1];
             }
         }
+        nlp[i] = nlp_count;
+        nlp_count = 0;
         // printf("\n");
     }
 }
@@ -181,8 +186,6 @@ int main(int argc, char** argv) {
     int* start_nodes;  // list of starting nodes
     int* end_nodes;    // list of ending nodes
     int* weight;       // weight of edge from start_nodes[i] -> end_nodes[i]
-    int lp = 0;        // longest path represented by summation of total weight
-    int num_lp = 0;    // number of paths that match this weight
 
     int* lp_arr;           // longest path array. Each index corresponds to a node on the graph. The i'th node corresponds to the i'th index of the array
     int* num_lp_arr;          // Same logic as above.

@@ -10,34 +10,95 @@ Assignment02 ~ Find longest path in Directed Acyclic Graph and number of longest
 #include <assert.h>
 
 #define MAX_FILENAME_LEN 14
+#define BIG_NEGATIVE_NUMBER -2147483640
 
-// ! To be Removed: usage(int, char**)
-// void usage(int argc, char** argv) {
-//     if (argc < 3 || argc > 3) {
-//         fprintf(stderr, "usage: %s <input> <output>\n", argv[0]);
-//         exit(EXIT_FAILURE);
-//     }
-// }
 
 /* Node Struct
  * A Node contains a value and a list of its neighbors
 */
 typedef struct Node {
-    int val;          // value of current node
-    struct Node* neighbors;  // list of node's neighbors
+    int val;  // value of current node
+    int lp;   // current longest path value (by weight)
+    int nlp;  // current number of longest paths
+    int w;    // if node is a predecessor then w represents weight of edge from sucessor -> node
+    // struct Node* next;
 } Node;
 
-/* Edge Struct
- * An edge contains two values representing starting node and ending node
-*/
-typedef struct Edge {
-    int start;  // Start of edge
-    int end;    // End of edge
-    int w;      // weight of edge between start -> end
-} Edge;
+// Todo: add comments
+void Malloc_P_Tree(int n, Node*** p) {
+    // malloc the predecessor node array
+    
+    *p = (Node **) malloc(sizeof(Node *) * n);
 
-// Todo: malloc the graph 
-void Malloc_Graph();
+    for (int i = 0; i < n; i++) {
+        (*p)[i] = malloc(sizeof(Node) * n);
+        for (int j = 0; j < n; j++) {
+            if (j == 0)
+                (*p)[i][j].val = i + 1;
+            else
+                (*p)[i][j].val = -1;
+
+            if (i == 0 && j == 0)
+                (*p)[i][j].lp = 0;
+            else
+                (*p)[i][j].lp = BIG_NEGATIVE_NUMBER;
+
+            (*p)[i][j].nlp = 1;
+            (*p)[i][j].w = 0;
+        }
+    }
+
+    // for (int i = 0; i < n; i++) {
+    //     for (int j = 0; j < n; j++) {
+    //         printf(" %d ", p[i][j].val);
+    //     }
+    //     printf("\n");
+    // }
+}
+
+// Todo: add comments
+void Build_P_Tree(int n, int m, int* start, int* end, int* weight, Node** p) {
+    // int next_pred = 1;
+    for (int i = 0; i < m; i++) {
+        int curr_node = end[i] - 1;
+        for (int j = 0; j < n; j++) {
+            if (p[curr_node][j].val == -1) {
+                p[curr_node][j].val = start[i];
+                p[curr_node][j].w = weight[i];
+                break;
+            }
+        }
+    }
+
+    // for (int i = 0; i < n; i++) {
+    //     for (int j = 0; j < n; j++) {
+    //         printf(" %d ", p[i][j].val);
+    //     }
+    //     printf("\n");
+    // }
+}
+
+// Todo: add comments
+void Process_P_Tree(int n, int m, int* lp, int* nlp, Node** p) {
+    
+    for (int i = 0; i < n; i++) {
+        // printf("Node(%d) ~ ", i + 1);
+        for (int j = 1; j < n; j++) {
+            if (p[i][j].val == -1)
+                break;
+            else {
+
+                if (p[i][j].w + lp[p[i][j].val - 1] > lp[i]) {
+                    lp[i] = p[i][j].w + lp[p[i][j].val - 1];
+                    nlp[i] = nlp[i - 1];
+                } else if (p[i][j].w + lp[p[i][j].val - 1] == lp[i])
+                    nlp[i] += nlp[i-1];
+                // printf("lp : %d\n", lp[i]);
+            }
+        }
+        // printf("\n");
+    }
+}
 
 // Todo: Read in data from input file ...
 void Read_Matrix_Data(int *n, int *m, int** start, int** end, int** weight) {
@@ -62,77 +123,70 @@ void Read_Matrix_Data(int *n, int *m, int** start, int** end, int** weight) {
     }
 
     // ! TO BE REMOVED LATER:
-    printf("Grabbing graph data from stdin...\n");
-    printf(".\n");
-    printf(". N : %d\n. M : %d\n", *n, *m);
-    printf(".\n");
-    for (int j = 0; j < *m; j++)
-        printf(". . %d -> %d . W : %d\n", (*start)[j], (*end)[j], (*weight)[j]);
-    printf(".\n");
-    printf(". Done\n");
-    printf("\n");
+    // printf("Grabbing graph data from stdin...\n");
+    // printf(".\n");
+    // printf(". N : %d\n. M : %d\n", *n, *m);
+    // printf(".\n");
+    // for (int j = 0; j < *m; j++)
+    //     printf(". . %d -> %d . W : %d\n", (*start)[j], (*end)[j], (*weight)[j]);
+    // printf(".\n");
+    // printf(". Done\n");
+    // printf("\n");
 }
-
-// Todo: T-Sort
-void TopologicalSort();
 
 // main is where the whole program executes
 int main() {    
     // function used to define usage of program
-    // ! usage(argc, argv); 
 
-    // ! int name_len = strlen(argv[1]);  // gets length of input file 1
+    int n;             // Number of Nodes
+    int m;             // Number of Edges
+    int* start_nodes;  // list of starting nodes
+    int* end_nodes;    // list of ending nodes
+    int* weight;       // weight of edge from start_nodes[i] -> end_nodes[i]
 
-    /*
-    ! // if (name_len > MAX_FILENAME_LEN) {
-    ! //     fprintf(stderr, "Input file <%s> contains too many characters. Max length allowed is : %d\n", argv[1], MAX_FILENAME_LEN);
-    ! //     exit(EXIT_FAILURE);
-    ! // }
-    */
-
-    // ! char matrix_name[MAX_FILENAME_LEN];  // init char *
-    // ! strcpy(matrix_name, argv[1]);        // copies over file_name to a char*
-
-    int n;  // Number of Nodes
-    int m;  // Number of Edges
-    int* start_nodes;
-    int* end_nodes;
-    int* weight;
+    int* lp_arr;           // longest path array. Each index corresponds to a node on the graph. The i'th node corresponds to the i'th index of the array
+    int* num_lp_arr;          // Same logic as above.
+    Node** p_tree;
 
     /* ----------------------------------------------------------------------------------------- */
     // Beginning stdout stream ... 
     printf("\n");
-    // ! fprintf(stdout, "Beginning read of Matrix : <%s> ... \n", matrix_name);
 
-    // Todo: using file/io read in data from input file and store in some arr
-
-    // ! start_nodes = malloc(sizeof(int) * m);
-    // ! end_nodes = malloc(sizeof(int) * m);
-    // ! weight = malloc(sizeof(int) * m);
-
-    // !FILE* input = fopen(argv[1], "r");  // Opens input file for read only
-
-    /*
-    ! // if (input == NULL) {
-    ! //     fprintf(stderr, "ERR: could not open file <%s>\n", matrix_name);
-    ! //     exit(EXIT_FAILURE);
-    ! // }
-    */
-
-    // ! Read_Matrix_Data(&n, &m, &start_nodes, &end_nodes, &weight, &input);
     Read_Matrix_Data(&n, &m, &start_nodes, &end_nodes, &weight);
 
     assert(start_nodes);
     assert(end_nodes);
     assert(weight);
 
-    // ! fclose(input);
+    /* ------------------------------------------- */
+    lp_arr = malloc(sizeof(int) * n);
+    num_lp_arr = malloc(sizeof(int) * n);
 
-    // Todo: malloc necessary items from the arr to the 'graph'
+    // Initialize all values in lp_arr to 0 and num_lp_arr to 1
+    for (int i = 0; i < n; i++) {
+        lp_arr[i] = 0;
+        num_lp_arr[i] = 1;
+    }
 
-    // Malloc_Graph();
+    Malloc_P_Tree(n, &p_tree);
 
-    //Todo: stuff ...
+    Build_P_Tree(n, m, start_nodes, end_nodes, weight, p_tree);
+
+    Process_P_Tree(n, m, lp_arr, num_lp_arr, p_tree);
+
+    printf("lp  : ");
+    for (int i = 0; i < n; i++) {
+        printf("%d ", lp_arr[i]);
+    }
+    printf("\n");
+
+    printf("nlp : ");
+    for (int i = 0; i < n; i++) {
+        printf("%d ", num_lp_arr[i]);
+    }
+    printf("\n");
+
+    fprintf(stdout, "longest path: %d\nnumber of longest paths: %d\n", lp_arr[n-1], num_lp_arr[n-1]);
 
     // End of stout stream.
     /* ----------------------------------------------------------------------------------------- */
