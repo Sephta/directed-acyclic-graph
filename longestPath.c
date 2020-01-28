@@ -118,7 +118,7 @@ void Process_P_Tree(int n, int m, int* lp, int* nlp, Node** p) {
                 if (p[i][j].w + lp[p[i][j].val - 1] > lp[i]) {
                     lp[i] = p[i][j].w + lp[p[i][j].val - 1];
                 } else if (p[i][j].w + lp[p[i][j].val - 1] == lp[i])
-                    nlp[i] += 1;
+                    nlp[i] += nlp[i-1];
                 // printf("lp : %d\n", lp[i]);
             }
         }
@@ -252,9 +252,6 @@ int main(int argc, char** argv) {
     }
     printf("\n");
 
-    lp = lp_arr[n];
-    num_lp = num_lp_arr[n];
-
 /* ------------------------------------------- */
 
     // Writing answer to output file specified in arg 2 (argv[2])
@@ -268,7 +265,7 @@ int main(int argc, char** argv) {
         exit(EXIT_FAILURE);
     }
     
-    fprintf(output, "longest path: %d\nnumber of longest paths: %d\n", lp, num_lp);
+    fprintf(output, "longest path: %d\nnumber of longest paths: %d\n", lp_arr[n-1], num_lp_arr[n-1]);
 
     fclose(output);
     fprintf(stdout, "Done\n");
