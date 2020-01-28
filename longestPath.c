@@ -25,21 +25,44 @@ void usage(int argc, char** argv) {
 typedef struct Node {
     int val;          // value of current node
     struct Node* neighbors;  // list of node's neighbors
+    int color;  // 0: unvisited, 1: visited
 } Node;
 
 /* Edge Struct
  * An edge contains two values representing starting node and ending node
 */
 typedef struct Edge {
-    int start;  // Start of edge
-    int end;    // End of edge
-    int w;      // weight of edge between start -> end
+    Node* start;  // Start of edge
+    Node* end;    // End of edge
+    int w;        // weight of edge between start -> end
 } Edge;
 
-// Todo: malloc the graph 
-void Malloc_Graph();
+/* Graph Struct
+ * A Graph G = {V, E} where |V| is a set of vertices (nodes) and |E| is a set of edges
+*/
+typedef struct Graph {
+    Edge* adj;
+} Graph;
 
-// Todo: Read in data from input file ...
+// Todo: create malloc for node
+void Malloc_Node();
+
+// Todo: create malloc for edge
+void Malloc_Edge();
+
+// Todo: malloc the graph 
+void Malloc_Graph(int n, int m, int* start, int* end, int* weight, Graph* g) {
+    // Malloc the graph
+    g = malloc(sizeof(Graph));
+
+    g->adj = malloc(sizeof(Edge) * m);
+
+    for (int i = 0; i < m; i++) {
+        g->adj[i].start = malloc(sizeof(Node));
+        g->adj[i].end = malloc(sizeof(Node));
+    }
+}
+
 void Read_Matrix_Data(int *n, int *m, int** start, int** end, int** weight, FILE** input) {
     /* First line of the file contains two numbers N, and M
        * N : number of nodes
@@ -73,7 +96,7 @@ void Read_Matrix_Data(int *n, int *m, int** start, int** end, int** weight, FILE
     // printf("\n");
 }
 
-// Todo: T-Sort
+// ? T-Sort
 void TopologicalSort();
 
 // main is where the whole program executes
@@ -91,11 +114,13 @@ int main(int argc, char** argv) {
     char matrix_name[MAX_FILENAME_LEN];  // init char *
     strcpy(matrix_name, argv[1]);        // copies over file_name to a char*
 
-    int n;  // Number of Nodes
-    int m;  // Number of Edges
-    int* start_nodes;
-    int* end_nodes;
-    int* weight;
+    int n;             // Number of Nodes
+    int m;             // Number of Edges
+    int* start_nodes;  // list of starting nodes
+    int* end_nodes;    // list of ending nodes
+    int* weight;       // weight of edge from start_nodes[i] -> end_nodes[i]
+    int lp = 0;        // longest path represented by summation of total weight
+    int num_lp = 0;    // number of paths that match this weight
 
     /* ----------------------------------------------------------------------------------------- */
     // Beginning stdout stream ... 
@@ -125,7 +150,8 @@ int main(int argc, char** argv) {
 
     // Todo: malloc necessary items from the arr to the 'graph'
 
-    Malloc_Graph();
+    Graph* g;
+    Malloc_Graph(n, m, start_nodes, end_nodes, weight, g);
 
     //Todo: stuff ...
 
@@ -137,6 +163,7 @@ int main(int argc, char** argv) {
     free(start_nodes);
     free(end_nodes);
     free(weight);
+    free(g);
 
     return 0;
 }
