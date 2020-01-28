@@ -80,23 +80,37 @@ void Build_P_Tree(int n, int m, int* start, int* end, int* weight, Node** p) {
 
 // Todo: add comments
 void Process_P_Tree(int n, int m, int* lp, int* nlp, Node** p) {
-    
+    /*
+     * i = current node
+     * j = current predecessor
+     * w = weight
+     * val = node value
+     * lp[i] = longest path of i'th node
+     * nlp[i] = number of longest paths to i'th node
+    */
+
+    // from node 1 till node n
     for (int i = 0; i < n; i++) {
-        // printf("Node(%d) ~ ", i + 1);
+        // from predecessor 1 till n
         for (int j = 1; j < n; j++) {
+            // if curr_pred value == -1 then no more predecessors
             if (p[i][j].val == -1)
                 break;
             else {
-
+                // (curr_pred.w + prev_node's lp > curr_node's lp)
                 if (p[i][j].w + lp[p[i][j].val - 1] > lp[i]) {
+                    // curr_node's lp = curr_pred.w + prev_nodes's lp
                     lp[i] = p[i][j].w + lp[p[i][j].val - 1];
-                    nlp[i] = nlp[i - 1];
-                } else if (p[i][j].w + lp[p[i][j].val - 1] == lp[i])
-                    nlp[i] += nlp[i-1];
-                // printf("lp : %d\n", lp[i]);
+                    // curr_nlp = previous nlp
+                    nlp[i] = nlp[p[i][j].val - 1];
+                }
+                // curr_pred.w + prev_node's lp == curr_node's lp
+                else if (p[i][j].w + lp[(p[i][j].val) - 1] == lp[i]){
+                    // curr_nlp += prev_nlp
+                    nlp[i] += nlp[i - 1];
+                }
             }
         }
-        // printf("\n");
     }
 }
 
@@ -150,7 +164,6 @@ int main() {
 
     /* ----------------------------------------------------------------------------------------- */
     // Beginning stdout stream ... 
-    printf("\n");
 
     Read_Matrix_Data(&n, &m, &start_nodes, &end_nodes, &weight);
 
@@ -174,23 +187,10 @@ int main() {
 
     Process_P_Tree(n, m, lp_arr, num_lp_arr, p_tree);
 
-    printf("lp  : ");
-    for (int i = 0; i < n; i++) {
-        printf("%d ", lp_arr[i]);
-    }
-    printf("\n");
-
-    printf("nlp : ");
-    for (int i = 0; i < n; i++) {
-        printf("%d ", num_lp_arr[i]);
-    }
-    printf("\n");
-
     fprintf(stdout, "longest path: %d\nnumber of longest paths: %d\n", lp_arr[n-1], num_lp_arr[n-1]);
 
     // End of stout stream.
     /* ----------------------------------------------------------------------------------------- */
-    printf("\n");
 
     // ! FREE anything malloc'd bellow...
     free(start_nodes);

@@ -107,27 +107,37 @@ void Build_P_Tree(int n, int m, int* start, int* end, int* weight, Node** p) {
 
 // Todo: add comments
 void Process_P_Tree(int n, int m, int* lp, int* nlp, Node** p) {
-    int nlp_count = 0;
+    /*
+     * i = current node
+     * j = current predecessor
+     * w = weight
+     * val = node value
+     * lp[i] = longest path of i'th node
+     * nlp[i] = number of longest paths to i'th node
+    */
+
+    // from node 1 till node n
     for (int i = 0; i < n; i++) {
-        // printf("Node(%d) ~ ", i + 1);
+        // from predecessor 1 till n
         for (int j = 1; j < n; j++) {
+            // if curr_pred value == -1 then no more predecessors
             if (p[i][j].val == -1)
                 break;
             else {
+                // (curr_pred.w + prev_node's lp > curr_node's lp)
                 if (p[i][j].w + lp[p[i][j].val - 1] > lp[i]) {
+                    // curr_node's lp = curr_pred.w + prev_nodes's lp
                     lp[i] = p[i][j].w + lp[p[i][j].val - 1];
-                    nlp_count += 1;
-                    // if (nlp[i] == nlp[i - 1])
-                    //     nlp[i] = nlp[i - 1];
-                    // else if (nlp[i - 1] < nlp[i])
-                    //     nlp[i] += nlp[i - 1];
-                } else if (p[i][j].w + lp[p[i][j].val - 1] == lp[i])
-                    // nlp[i] += nlp[i-1];
+                    // curr_nlp = previous nlp
+                    nlp[i] = nlp[p[i][j].val - 1];
+                }
+                // curr_pred.w + prev_node's lp == curr_node's lp
+                else if (p[i][j].w + lp[(p[i][j].val) - 1] == lp[i]){
+                    // curr_nlp += prev_nlp
+                    nlp[i] += nlp[i - 1];
+                }
             }
         }
-        nlp[i] = nlp_count;
-        nlp_count = 0;
-        // printf("\n");
     }
 }
 
@@ -233,8 +243,13 @@ int main(int argc, char** argv) {
 
     // Initialize all values in lp_arr to 0 and num_lp_arr to 1
     for (int i = 0; i < n; i++) {
-        lp_arr[i] = 0;
-        num_lp_arr[i] = 1;
+        if (i == 0) {
+            lp_arr[i] = 0;
+            num_lp_arr[i] = 1;
+        } else {
+            lp_arr[i] = BIG_NEGATIVE_NUMBER;
+            num_lp_arr[i] = 0;
+        }
     }
 
     Malloc_P_Tree(n, &p_tree);
