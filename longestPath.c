@@ -107,20 +107,22 @@ void Build_P_Tree(int n, int m, int* start, int* end, int* weight, Node** p) {
 
 // Todo: add comments
 void Process_P_Tree(int n, int m, int* lp, int* nlp, Node** p) {
+    
     for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
+        // printf("Node(%d) ~ ", i + 1);
+        for (int j = 1; j < n; j++) {
             if (p[i][j].val == -1)
                 break;
             else {
-                if (p[i][j].lp > lp[i]) {
-                    if (p[i][j].val == i + 1)
-                        lp[i] = 0;
-                    else {
-                        lp[i] += p[i][j].lp + p[i][j].w;
-                    }
-                }
+
+                if (p[i][j].w + lp[p[i][j].val - 1] > lp[i]) {
+                    lp[i] = p[i][j].w + lp[p[i][j].val - 1];
+                } else if (p[i][j].w + lp[p[i][j].val - 1] == lp[i])
+                    nlp[i] += 1;
+                // printf("lp : %d\n", lp[i]);
             }
         }
+        // printf("\n");
     }
 }
 
@@ -226,10 +228,10 @@ int main(int argc, char** argv) {
     lp_arr = malloc(sizeof(int) * n);
     num_lp_arr = malloc(sizeof(int) * n);
 
-    // Initialize all values in lp_arr and num_lp_arr to 0
+    // Initialize all values in lp_arr to 0 and num_lp_arr to 1
     for (int i = 0; i < n; i++) {
         lp_arr[i] = 0;
-        num_lp_arr[i] = 0;
+        num_lp_arr[i] = 1;
     }
 
     Malloc_P_Tree(n, &p_tree);
