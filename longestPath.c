@@ -39,16 +39,11 @@ void usage(int argc, char** argv) {
 /* Node Struct
  * A Node contains a value denoting which node it is in the graph, and two ints
  * int val : node value
- * int lp : current longest path to node from predecessors by weight
- * int nlp : number of longest paths to node
  * int w : when contained within the predecessor tree, a nodes weight is the weight of the edge from the node's sucessor
 */
 typedef struct Node {
     int val;  // value of current node
-    int lp;   // current longest path value (by weight)
-    int nlp;  // current number of longest paths
     int w;    // if node is a predecessor then w represents weight of edge from sucessor -> node
-    // struct Node* next;
 } Node;
 
 // Todo: add comments
@@ -64,26 +59,22 @@ void Malloc_P_Tree(int n, Node*** p) {
                 (*p)[i][j].val = i + 1;
             else
                 (*p)[i][j].val = -1;
-
-            if (i == 0 && j == 0)
-                (*p)[i][j].lp = 0;
-            else
-                (*p)[i][j].lp = BIG_NEGATIVE_NUMBER;
-
-            (*p)[i][j].nlp = 1;
             (*p)[i][j].w = 0;
         }
     }
-
-    // for (int i = 0; i < n; i++) {
-    //     for (int j = 0; j < n; j++) {
-    //         printf(" %d ", p[i][j].val);
-    //     }
-    //     printf("\n");
-    // }
 }
 
 // Todo: add comments
+void Free_P_Tree(int n, Node** p) {
+    for (int i = 0; i < n; i++) {
+        Node* current_ptr = p[i];
+        free(current_ptr);
+    }
+}
+
+/*
+ * This function simply initializes the adjaceny matrix defined in main()
+*/
 void Build_P_Tree(int n, int m, int* start, int* end, int* weight, Node** p) {
     // int next_pred = 1;
     for (int i = 0; i < m; i++) {
@@ -96,26 +87,17 @@ void Build_P_Tree(int n, int m, int* start, int* end, int* weight, Node** p) {
             }
         }
     }
-
-    // for (int i = 0; i < n; i++) {
-    //     for (int j = 0; j < n; j++) {
-    //         printf(" %d ", p[i][j].val);
-    //     }
-    //     printf("\n");
-    // }
 }
 
-// Todo: add comments
+/*
+    * i = current node
+    * j = current predecessor
+    * w = weight
+    * val = node value
+    * lp[i] = longest path of i'th node
+    * nlp[i] = number of longest paths to i'th node
+*/
 void Process_P_Tree(int n, int m, int* lp, int* nlp, Node** p) {
-    /*
-     * i = current node
-     * j = current predecessor
-     * w = weight
-     * val = node value
-     * lp[i] = longest path of i'th node
-     * nlp[i] = number of longest paths to i'th node
-    */
-
     // from node 1 till node n
     for (int i = 0; i < n; i++) {
         // from predecessor 1 till n
@@ -141,7 +123,9 @@ void Process_P_Tree(int n, int m, int* lp, int* nlp, Node** p) {
     }
 }
 
-// Todo: add comments
+/*
+ * This function reads the data from stdin and stores into arrays
+*/
 void Read_Matrix_Data(int *n, int *m, int** start, int** end, int** weight, FILE** input) {
     /* First line of the file contains two numbers N, and M
        * N : number of nodes
@@ -163,7 +147,7 @@ void Read_Matrix_Data(int *n, int *m, int** start, int** end, int** weight, FILE
         fscanf(*input, "%d %d %d", &(*start)[i], &(*end)[i], &(*weight)[i]);
     }
 
-    // ! TO BE REMOVED LATER:
+    // Bellow is optional printing of the file contents in a pseudo readable format...
     // printf("Grabbing graph data from stdin...\n");
     // printf(".\n");
     // printf(". N : %d\n. M : %d\n", *n, *m);
@@ -175,9 +159,11 @@ void Read_Matrix_Data(int *n, int *m, int** start, int** end, int** weight, FILE
     // printf("\n");
 }
 
-// main is where the whole program executes
-// Todo: add comments
-int main(int argc, char** argv) {    
+/*
+ * main is where the whole program executes
+*/ 
+int main(int argc, char** argv) {
+    
     // function used to define usage of program
     usage(argc, argv); 
 
@@ -204,13 +190,7 @@ int main(int argc, char** argv) {
 /* --------------------------------------------------------------------------------------------- */
     // Beginning stdout stream ... 
     printf("\n");
-    fprintf(stdout, "Beginning read of Matrix : <%s> ... \n", matrix_name);
-
-    // Todo: using file/io read in data from input file and store in some arr
-
-    // ! start_nodes = malloc(sizeof(int) * m);
-    // ! end_nodes = malloc(sizeof(int) * m);
-    // ! weight = malloc(sizeof(int) * m);
+    fprintf(stdout, "Beginning read of Matrix : <%s> ...", matrix_name);
 
     FILE* input = fopen(argv[1], "r");  // Opens input file for read only
 
@@ -221,15 +201,9 @@ int main(int argc, char** argv) {
 
     Read_Matrix_Data(&n, &m, &start_nodes, &end_nodes, &weight, &input);
 
-    // printf("Grabbing graph data from stdin...\n");
-    // printf(".\n");
-    // printf(". N : %d\n. M : %d\n", n, m);
-    // printf(".\n");
-    // for (int j = 0; j < m; j++)
-    //     printf(". . %d -> %d . W : %d\n", start_nodes[j], end_nodes[j], weight[j]);
-    // printf(".\n");
-    // printf(". Done\n");
-    // printf("\n");
+    fprintf(stdout, " Done\n");
+
+    printf("\n");
 
     assert(start_nodes);
     assert(end_nodes);
@@ -252,23 +226,31 @@ int main(int argc, char** argv) {
         }
     }
 
+/* ------------------------------------------- */
+
     Malloc_P_Tree(n, &p_tree);
 
     Build_P_Tree(n, m, start_nodes, end_nodes, weight, p_tree);
 
     Process_P_Tree(n, m, lp_arr, num_lp_arr, p_tree);
 
-    printf("lp  : ");
-    for (int i = 0; i < n; i++) {
-        printf("%d ", lp_arr[i]);
-    }
-    printf("\n");
+/* ------------------------------------------- */
 
-    printf("nlp : ");
-    for (int i = 0; i < n; i++) {
-        printf("%d ", num_lp_arr[i]);
-    }
-    printf("\n");
+    // Once again, commented out section here is option.
+    // I mostly used it for bug testing and simply prints data to be read
+
+    // printf("lp  : ");
+    // for (int i = 0; i < n; i++) {
+    //     printf("%d ", lp_arr[i]);
+    // }
+
+    // printf("\n");
+
+    // printf("nlp : ");
+    // for (int i = 0; i < n; i++) {
+    //     printf("%d ", num_lp_arr[i]);
+    // }
+    // printf("\n\n");
 
 /* ------------------------------------------- */
 
@@ -286,20 +268,23 @@ int main(int argc, char** argv) {
     fprintf(output, "longest path: %d\nnumber of longest paths: %d\n", lp_arr[n-1], num_lp_arr[n-1]);
 
     fclose(output);
+    
     fprintf(stdout, "Done\n");
 
     // End of stdout stream.
 /* --------------------------------------------------------------------------------------------- */
     printf("\n");
 
-    // ! FREE anything malloc'd bellow...
+    // Bellow I free all malloc'd memory for this project...
     free(start_nodes);
     free(end_nodes);
     free(weight);
 
+    Free_P_Tree(n, p_tree);
+    free(p_tree);
+
     free(lp_arr);
     free(num_lp_arr);
-    free(p_tree);
 
     return 0;
 }
